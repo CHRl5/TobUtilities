@@ -153,10 +153,18 @@ public class TobUtilitiesPlugin extends Plugin
 		metronomeService.onGameTick(tick);
 		if (!oldRegion.equals(Region.BLOAT) && region.equals(Region.BLOAT)) {
 			bloatHandler.onRoomEntry();
+			if (config.hideBloatFloor())
+			{
+				clientThread.invokeLater(this::tryReloadScene);
+			}
 		}
 		if (oldRegion.equals(Region.BLOAT) && !region.equals(Region.BLOAT))
 		{
 			bloatHandler.onRoomExit();
+			if (config.hideBloatFloor())
+			{
+				clientThread.invokeLater(this::tryReloadScene);
+			}
 		}
 		if (!oldRegion.equals(Region.VERZIK) && region.equals(Region.VERZIK))
 		{
