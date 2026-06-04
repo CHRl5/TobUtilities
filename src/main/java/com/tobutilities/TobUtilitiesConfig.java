@@ -484,5 +484,17 @@ public interface TobUtilitiesConfig extends Config
 		return new Color(89, 0, 0);
 	}
 
+	@ConfigItem(
+		keyName = "hideVanillaTobHealthBar",
+		name = "Hide vanilla TOB health bar",
+		description = "Hides the default Theatre of Blood top-center health bar overlay while inside TOB",
+		position = 10,
+		section = Verzik
+	)
+	default boolean hideVanillaTobHealthBar()
+	{
+		return false;
+	}
+
 
 }
