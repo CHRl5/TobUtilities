@@ -35,7 +35,7 @@ public class VerzikHandlerTest
 	}
 
 	@Test
-	public void preservesEntryCameraForThreeRestoreTicks()
+	public void preservesEntryCameraWithSingleRestoreTick()
 	{
 		when(client.getGameState()).thenReturn(GameState.LOGGED_IN);
 		when(client.getCameraYawTarget()).thenReturn(512);
@@ -44,11 +44,45 @@ public class VerzikHandlerTest
 		handler.captureEntryCameraTargets();
 		handler.onRoomEntry();
 		handler.onGameTick(null);
-		handler.onGameTick(null);
+
+		verify(client, org.mockito.Mockito.times(1)).setCameraYawTarget(512);
+		verify(client, org.mockito.Mockito.times(1)).setCameraPitchTarget(240);
+	}
+
+	@Test
+	public void restoresCameraImmediatelyOnRoomEntry()
+	{
+		when(client.getGameState()).thenReturn(GameState.LOGGED_IN);
+		when(client.getCameraYawTarget()).thenReturn(700);
+		when(client.getCameraPitchTarget()).thenReturn(260);
+
+		handler.captureEntryCameraTargets();
+		handler.onRoomEntry();
+
+		verify(client, org.mockito.Mockito.times(1)).setCameraYawTarget(700);
+		verify(client, org.mockito.Mockito.times(1)).setCameraPitchTarget(260);
+	}
+
+	@Test
+	public void loggedInStateChangeDoesNotRetriggerCameraRestore()
+	{
+		when(client.getGameState()).thenReturn(GameState.LOGGED_IN);
+		when(client.getCameraYawTarget()).thenReturn(640);
+		when(client.getCameraPitchTarget()).thenReturn(220);
+
+		handler.captureEntryCameraTargets();
+		handler.onRoomEntry();
 		handler.onGameTick(null);
 
-		verify(client, org.mockito.Mockito.times(3)).setCameraYawTarget(512);
-		verify(client, org.mockito.Mockito.times(3)).setCameraPitchTarget(240);
+		clearInvocations(client);
+
+		GameStateChanged event = new GameStateChanged();
+		event.setGameState(GameState.LOGGED_IN);
+		handler.onGameStateChanged(event);
+		handler.onGameTick(null);
+
+		verify(client, never()).setCameraYawTarget(640);
+		verify(client, never()).setCameraPitchTarget(220);
 	}
 
 	@Test

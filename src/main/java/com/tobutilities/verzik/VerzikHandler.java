@@ -1,8 +1,6 @@
 package com.tobutilities.verzik;
 
 import com.tobutilities.common.RoomHandler;
-import com.tobutilities.common.enums.Region;
-import com.tobutilities.common.util.CommonUtils;
 
 import com.tobutilities.common.player.TobPlayerOrb;
 import com.tobutilities.TobUtilitiesPlugin;
@@ -44,7 +42,7 @@ import org.apache.commons.lang3.StringUtils;
 public class VerzikHandler extends RoomHandler
 
 {
-	private static final int VERZIK_CAMERA_RESTORE_TICKS = 3;
+	private static final int VERZIK_CAMERA_RESTORE_TICKS = 1;
 
 	@Getter
 	private TobPlayerOrb tobPlayerOrb = TobPlayerOrb.UNKNOWN;
@@ -302,7 +300,7 @@ public class VerzikHandler extends RoomHandler
 
 	public void onRoomExit()
 	{
-		cameraRestoreTicksRemaining = 0;
+		clearCameraSnapshot();
 	}
 
 	public void onGameStateChanged(GameStateChanged event)
@@ -319,16 +317,7 @@ public class VerzikHandler extends RoomHandler
 			return;
 		}
 
-		switch (event.getGameState())
-		{
-			case LOGGED_IN:
-				if (CommonUtils.getRegionByRegionId(CommonUtils.getRegionID(client)) == Region.VERZIK)
-				{
-					beginCameraRestore();
-					restoreSavedCameraTargetsIfNeeded();
-				}
-				break;
-		}
+		// Only restore on explicit room entry to avoid re-triggering camera snaps on other game-state transitions.
 	}
 
 	private void beginCameraRestore()
